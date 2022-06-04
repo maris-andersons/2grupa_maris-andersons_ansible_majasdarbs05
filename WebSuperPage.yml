@@ -1,0 +1,36 @@
+
+---
+- hosts: webservers
+  become: yes
+  tasks: 
+    - name: Install Apache and FirewallD services
+      apt:
+        update_cache: true
+#       name: httpd  - package is virtual packahe, you should explicitly select one to install..... 
+        name: 
+         - apache2
+         - firewalld
+        state: latest
+    - name: Cleanup Apache webroot directory
+      file:
+        path: /var/www/html
+        state: absent 
+    - name: Git checkout the website -- import website from Git
+      git:
+        dest: /var/www/html
+        repo: https://github.com/lu-vumc-devops/lu-vumc-devops.superwebpage.git
+    - name: Start Firewalld services, should be started before Apache
+      service:
+        name: firewalld
+        state: started
+    - name: Start Apache services
+      service:
+        name: apache2
+        state: started
+#       Apache2 - Ubuntu masked-service workaround, doesn't work together with Firewalld service-config
+        masked: no
+    - name: Open the firewall ports
+      firewalld:
+        service: http
+        permanent: yes
+        state: enabled

@@ -1,0 +1,20 @@
+---
+- name: Playbook to Install Packages - WEB
+  hosts: webservers
+  become: yes
+  tasks:
+  - name: Install php and apache
+    package:
+     name:
+        - php
+        - apache2
+     state: present
+- name: Playbook to Install Packeges - DB
+  hosts: database
+  become: yes
+  tasks:
+  - name: Install DB
+    package:
+     name: mariadb-server
+     state: present
+   
